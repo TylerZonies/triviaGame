@@ -31,20 +31,50 @@ var questionArr = [
 var questionIndex = 0;
 var questionTimeLimit;
 var progressBarInterval;
-var hintInterval;
+var hintOneInterval;
+var hintTwoInterval;
+var hintThreeInterval;
 var currentQuestion;
 function askQuestion(){
+    var isPlaced = false;
     currentQuestion = questionArr[questionIndex];
     $("#questionText").text(currentQuestion.question);
-    var answerSlot = Math.floor(Math.random() * 3);
-    $("#question" + answerSlot).text(currentQuestion.answer);
+    var answerSlot = Math.floor(Math.random() * 4);
     for(var i = 0; i < 3; i++){
         if(i == answerSlot){
-            $("#question" + (i+1)).text(currentQuestion.wrong[i]);
-        }else{
-            $("#question" + i).text(currentQuestion.wrong[i]);
+            var answerRow = $("<div>");
+            answerRow.addClass("row answerBtn text-center");
+            answerRow.attr("data-correct", 1);
+            answerRow.html("<h2>" + currentQuestion.answer + "</h2>");
+            $("#answerArea").append(answerRow);
+            isPlaced = true;
         }
+        var wrongRow = $("<div>");
+        wrongRow.addClass("row answerBtn text-justify-center");
+        wrongRow.attr("data-correct", 0);
+        wrongRow.html("<h2 class = \"text-justify-center\">" + currentQuestion.wrong[i] + "</h2>");
+        $("#answerArea").append(wrongRow);
+    }
+    if(!isPlaced){
+        var answerRow = $("<div>");
+        answerRow.addClass("row answerBtn text-justify-center");
+        answerRow.attr("data-correct", 1);
+        answerRow.html("<h2 class = \"text-center\">" + currentQuestion.answer + "</h2>");
+        $("#answerArea").append(answerRow);
     }
 
 }
-askQuestion();
+function addHints(){
+    var hintArea = $("#hintText");
+    
+    hintOneInterval = setTimeout(function(){
+
+    })
+}
+function newRound(){
+    askQuestion();
+    addHints();
+    startCountdown();
+    questionIndex++;
+}
+$("#startButton").on("click", newRound)
