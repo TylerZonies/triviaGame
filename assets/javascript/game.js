@@ -34,11 +34,20 @@ var progressBarInterval;
 var hintOneInterval;
 var hintTwoInterval;
 var hintThreeInterval;
+var guessTimeInterval;
 var currentQuestion;
+var progressBarLength = 0;
+var isCorrect = false;
+var wins = 0;
+var loss = 0;
 function askQuestion(){
+    progressBarLength = 20;
+    $("#questionArea").empty();
     var isPlaced = false;
     currentQuestion = questionArr[questionIndex];
-    $("#questionText").text(currentQuestion.question);
+    var questionText = $("<h2>").attr("id", "questionText");
+    questionText.text(currentQuestion.question);
+    $("#questionArea").append(questionText);
     var answerSlot = Math.floor(Math.random() * 4);
     for(var i = 0; i < 3; i++){
         if(i == answerSlot){
@@ -66,15 +75,79 @@ function askQuestion(){
 }
 function addHints(){
     var hintArea = $("#hintText");
-    
+    hintArea.empty();
+    var newHint
+    var hintList = $("<ul>");
+    $("#hintText").append(hintList)
     hintOneInterval = setTimeout(function(){
+        var hint = $("<li>").text(currentQuestion.hint[0]);
+        hintList.append(hint);
+    }, 5000);
+    hintTwoInterval = setTimeout(function(){
+        var hint = $("<li>").text(currentQuestion.hint[1]);
+        hintList.append(hint);
+        
+    }, 10000);
+    hintThreeInterval = setTimeout(function(){
+        var hint = $("<li>").text(currentQuestion.hint[2]);
+        hintList.append(hint);
+    }, 15000);
+}
+function counter(){
+    progressBarLength--;
+    $("#timer").text("Time Remaining: " + progressBarLength);
+    // progressBarLength += 5;
+    // var progressBar = $(".progress-bar");
+    // progressBar.attr({"style": progressBarLength + "%", "aria-valuenow": progressBarLength});
+}
+function startCountdown(){
+    $("#timer").text("Time remaining: 20")
+    progressBarInterval = setInterval(counter, 1000);
+    guessTimeInterval = setTimeout(answerGiven, 20000);
+}
+function answerCheck(val){
+    if(val == 1){
+        isCorrect = true;
+    }
+    answerGiven();
+}
+function gameOver(){
+    $("#questionArea").empty();
+    if(loss < wins){
+        
+    }
+}
+function answerGiven(){
+    $("#timer").empty();
+    $("#questionArea").empty()
+    $("#answerArea").empty();
+    $("#hintText").empty();
+    clearInterval(progressBarInterval);
+    clearTimeout(guessTimeInterval, hintOneInterval, hintTwoInterval, hintThreeInterval);
+    
 
-    })
+    if(isCorrect){
+        $("#questionArea").text(currentQuestion.correctText);
+        wins++;
+    }else{
+        $("#questionArea").text("Incorrect! the correct answer was: " + currentQuestion.answer);
+        loss++;
+    }
+    if(questionIndex == questionArr.length){
+        gameOver();
+    }else{
+        questionIndex++;
+        setTimeout(newRound, 5000);
+    }
+    
 }
 function newRound(){
+    isCorrect = false;
     askQuestion();
     addHints();
     startCountdown();
-    questionIndex++;
 }
-$("#startButton").on("click", newRound)
+$("#startButton").on("click", newRound);
+$("#answerArea").on("click", ".answerBtn", function(){
+    answerCheck($(this).attr("data-correct"));
+})
